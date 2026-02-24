@@ -94,9 +94,9 @@ VOICE_LANG_MAP = {
     "af": "en-us", "am": "en-us",
     "bf": "en-gb", "bm": "en-gb",
     "jf": "ja",    "jm": "ja",
-    "zf": "zh",    "zm": "zh",
+    "zf": "cmn",   "zm": "cmn",
     "ef": "es",    "em": "es",
-    "ff": "fr",
+    "ff": "fr-fr",
     "hf": "hi",    "hm": "hi",
     "if": "it",    "im": "it",
     "pf": "pt-br", "pm": "pt-br",
@@ -1734,6 +1734,7 @@ def _load_alignment_model():
 
 def _run_alignment(wav_path, prompt_text):
     """Run forced alignment. Returns list of {word, begin, end} or None."""
+    import warnings
     try:
         model = _load_alignment_model()
         # Load audio as numpy array to avoid stable-ts needing ffmpeg in PATH
@@ -1748,7 +1749,15 @@ def _run_alignment(wav_path, prompt_text):
                 np.arange(len(audio), dtype=np.float32),
                 audio,
             ).astype(np.float32)
-        result = model.align(audio, prompt_text, language="en", fast_mode=True)
+        with warnings.catch_warnings(record=True) as caught:
+            warnings.simplefilter("always")
+            result = model.align(audio, prompt_text, language="en", fast_mode=True)
+        for w in caught:
+            msg = str(w.message)
+            if "failed to align" in msg:
+                logger.warning("Align partial: {}", msg)
+            else:
+                logger.debug("Align warning: {}", msg)
         alignment = []
         for w in result.all_words():
             word_text = w.word.strip()
@@ -2431,13 +2440,16 @@ if __name__ == "__main__":
     port = args.port if args.port else find_available_port(5000)
 
     # Startup banner (ASCII-safe for Windows cp1252 console)
+    W = 42  # inner width between pipes
+    url = f"http://localhost:{port}"
+    voices = f"Voices:  {len(VOICES)} available"
     print()
-    print("  \033[96m+------------------------------------------+\033[0m")
-    print("  \033[96m|\033[0m  \033[1mKokoro TTS Studio\033[0m                      \033[96m|\033[0m")
-    print("  \033[96m|\033[0m                                          \033[96m|\033[0m")
-    print(f"  \033[96m|\033[0m  \033[92m>\033[0m  http://localhost:{port:<24}\033[96m|\033[0m")
-    print(f"  \033[96m|\033[0m  \033[90m-\033[0m  Voices:  {len(VOICES):<2} available              \033[96m|\033[0m")
-    print("  \033[96m+------------------------------------------+\033[0m")
+    print(f"  \033[96m+{'-' * W}+\033[0m")
+    print(f"  \033[96m|\033[0m  \033[1m{'Kokoro TTS Studio':<{W - 2}}\033[0m\033[96m|\033[0m")
+    print(f"  \033[96m|\033[0m{' ' * W}\033[96m|\033[0m")
+    print(f"  \033[96m|\033[0m  \033[92m>\033[0m  {url:<{W - 5}}\033[96m|\033[0m")
+    print(f"  \033[96m|\033[0m  \033[90m-\033[0m  {voices:<{W - 5}}\033[96m|\033[0m")
+    print(f"  \033[96m+{'-' * W}+\033[0m")
     print()
 
     app.run(host="0.0.0.0", port=port, debug=False, threaded=True)

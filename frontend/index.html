@@ -5,6 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Kokoro TTS Studio</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%230f1520'/><circle cx='16' cy='13' r='5' fill='none' stroke='%234ECDC4' stroke-width='2'/><path d='M8 13v2a8 8 0 0016 0v-2' fill='none' stroke='%234ECDC4' stroke-width='2' stroke-linecap='round'/><line x1='16' y1='23' x2='16' y2='27' stroke='%234ECDC4' stroke-width='2' stroke-linecap='round'/><line x1='12' y1='27' x2='20' y2='27' stroke='%234ECDC4' stroke-width='2' stroke-linecap='round'/></svg>">
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -419,20 +420,24 @@
       white-space: nowrap;
     }
 
-    /* ---- Voice Blend ---- */
-    #blend-toggle-btn:hover {
-      border-color: var(--border-hover);
+    /* ---- Voice / Voice Blend Tabs ---- */
+    .voice-tab {
+      background: transparent;
+      color: var(--text-muted);
+    }
+
+    .voice-tab:hover {
+      background: rgba(255, 255, 255, 0.03);
       color: var(--text-secondary);
     }
 
-    #blend-toggle-btn[data-active="true"] {
-      border-color: rgba(167, 139, 250, 0.4);
-      background: rgba(167, 139, 250, 0.06);
-      color: var(--text);
+    .voice-tab.active {
+      background: rgba(78, 205, 196, 0.1);
+      color: var(--accent);
     }
 
-    #blend-toggle-btn[data-active="true"] #blend-status-pill {
-      background: rgba(167, 139, 250, 0.15);
+    .voice-tab.active[data-voice-tab="blend"] {
+      background: rgba(167, 139, 250, 0.1);
       color: #A78BFA;
     }
 
@@ -1875,33 +1880,43 @@
 
         <!-- Voices -->
         <section class="card p-5 mb-4 reveal" style="animation-delay:0.07s">
-          <label class="block text-[10px] font-bold uppercase tracking-[0.15em] mb-2.5"
-            style="color:var(--text-muted)">Voice</label>
-          <div id="lang-tabs" class="flex flex-wrap gap-1.5 mb-3"></div>
-          <div id="voice-grid" class="flex flex-wrap gap-2"></div>
-
-          <!-- Voice Blend Toggle -->
-          <div id="blend-toggle-row" style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border)">
-            <button id="blend-toggle-btn" data-active="false" onclick="toggleBlendMode()" style="display:flex;align-items:center;gap:8px;padding:8px 14px;border-radius:8px;
-                     border:1.5px solid var(--border);background:var(--bg-darkest);
-                     color:var(--text-muted);font-size:12px;font-weight:600;
-                     cursor:pointer;transition:all 0.2s;width:100%;font-family:inherit">
-              <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+          <!-- Voice / Voice Blend Tabs -->
+          <div id="voice-tabs" style="display:flex;gap:0;margin-bottom:14px;border-radius:8px;
+                   border:1.5px solid var(--border);overflow:hidden;background:var(--bg-darkest)">
+            <button class="voice-tab active" data-voice-tab="voice" onclick="switchVoiceTab('voice')"
+              style="flex:1;padding:9px 0;font-size:11px;font-weight:700;font-family:inherit;
+                     letter-spacing:0.08em;text-transform:uppercase;border:none;cursor:pointer;
+                     transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:6px">
+              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                viewBox="0 0 24 24">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                <circle cx="12" cy="7" r="4" />
+              </svg>
+              Voice
+            </button>
+            <button class="voice-tab" data-voice-tab="blend" onclick="switchVoiceTab('blend')"
+              style="flex:1;padding:9px 0;font-size:11px;font-weight:700;font-family:inherit;
+                     letter-spacing:0.08em;text-transform:uppercase;border:none;cursor:pointer;
+                     transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:6px">
+              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
                 viewBox="0 0 24 24">
                 <circle cx="6" cy="6" r="3" />
                 <circle cx="18" cy="18" r="3" />
                 <path d="M6 21V9a9 9 0 0 1 9 9" />
                 <path d="M18 3v12a9 9 0 0 1-9-9" />
               </svg>
-              <span>Voice Blend</span>
-              <span id="blend-status-pill" style="margin-left:auto;font-size:9px;font-weight:700;padding:2px 7px;
-                       border-radius:5px;font-family:'JetBrains Mono',monospace;
-                       background:rgba(78,205,196,0.1);color:var(--text-muted)">OFF</span>
+              Voice Blend
             </button>
           </div>
 
-          <!-- Voice Blend Panel -->
-          <div id="blend-panel" style="display:none;margin-top:12px">
+          <!-- Voice Tab Content -->
+          <div id="voice-tab-content">
+            <div id="lang-tabs" class="flex flex-wrap gap-1.5 mb-3"></div>
+            <div id="voice-grid" class="flex flex-wrap gap-2"></div>
+          </div>
+
+          <!-- Voice Blend Tab Content -->
+          <div id="blend-panel" style="display:none">
             <!-- Voice A / B Selectors -->
             <div style="display:grid;grid-template-columns:1fr 28px 1fr;gap:6px;align-items:end;margin-bottom:14px">
               <div>
@@ -2677,7 +2692,7 @@
         const savedPrompt = localStorage.getItem('kokoro-prompt');
         if (savedPrompt) { $('#prompt-input').value = _stripBrackets(savedPrompt); updateCounts(); }
         renderVoices();
-        if (STATE.blendMode) _applyBlendUI();
+        _applyBlendUI();
         buildEqualizer(); await loadHistory();
       } catch (e) { console.error('Init:', e); toast('Failed to connect to server', 'error'); }
     }
@@ -2827,27 +2842,29 @@
       { name: 'Bold', a: 'am_fenrir', b: 'am_onyx', ratio: 50, desc: 'Dynamic power' },
     ];
 
-    function toggleBlendMode() {
-      STATE.blendMode = !STATE.blendMode;
+    function switchVoiceTab(tab) {
+      STATE.blendMode = tab === 'blend';
       localStorage.setItem('kokoro-blend-mode', STATE.blendMode ? 'true' : 'false');
       _applyBlendUI();
     }
 
+    // Legacy toggle kept for any external callers
+    function toggleBlendMode() {
+      switchVoiceTab(STATE.blendMode ? 'voice' : 'blend');
+    }
+
     function _applyBlendUI() {
-      const btn = $('#blend-toggle-btn');
       const panel = $('#blend-panel');
-      const pill = $('#blend-status-pill');
-      const grid = $('#voice-grid');
-      const tabs = $('#lang-tabs');
+      const voiceContent = $('#voice-tab-content');
 
-      btn.dataset.active = STATE.blendMode ? 'true' : 'false';
-      pill.textContent = STATE.blendMode ? 'ON' : 'OFF';
+      // Update tab active states
+      $$('.voice-tab').forEach(t => {
+        t.classList.toggle('active', t.dataset.voiceTab === (STATE.blendMode ? 'blend' : 'voice'));
+      });
+
+      // Show/hide tab content
+      voiceContent.style.display = STATE.blendMode ? 'none' : '';
       panel.style.display = STATE.blendMode ? 'block' : 'none';
-
-      grid.style.opacity = STATE.blendMode ? '0.3' : '1';
-      grid.style.pointerEvents = STATE.blendMode ? 'none' : '';
-      tabs.style.opacity = STATE.blendMode ? '0.3' : '1';
-      tabs.style.pointerEvents = STATE.blendMode ? 'none' : '';
 
       if (STATE.blendMode) {
         updateBlendButtons();
@@ -2911,7 +2928,11 @@
           <div style="font-weight:600;font-size:11px">${p.name}</div>
           <div style="font-size:9px;color:var(--text-muted);margin-top:1px">${p.desc}</div>
         </button>`;
-      }).join('');
+      }).join('') + `<button class="blend-preset-btn" onclick="randomBlend()"
+        title="Random female + male SLERP blend" style="grid-column:1/-1;border-style:dashed">
+        <div style="font-weight:600;font-size:11px">&#127922; Random</div>
+        <div style="font-size:9px;color:var(--text-muted);margin-top:1px">Random F+M SLERP blend</div>
+      </button>`;
     }
 
     function applyBlendPreset(idx) {
@@ -2924,6 +2945,25 @@
       updateBlendButtons();
       $$('.blend-preset-btn').forEach((b, i) => b.classList.toggle('active', i === idx));
       toast(`${VOICE_META[p.a]?.name || p.a} + ${VOICE_META[p.b]?.name || p.b}`, 'info');
+    }
+    function randomBlend() {
+      const keys = Object.keys(VOICE_META);
+      const females = keys.filter(k => VOICE_META[k].g === 'f');
+      const males = keys.filter(k => VOICE_META[k].g === 'm');
+      const pick = arr => arr[Math.floor(Math.random() * arr.length)];
+      const a = pick(females);
+      let b = pick(males);
+      while (b === a) b = pick(males);
+      const ratio = Math.floor(Math.random() * 81) + 10; // 10-90
+      STATE.blendVoiceA = a;
+      STATE.blendVoiceB = b;
+      localStorage.setItem('kokoro-blend-a', a);
+      localStorage.setItem('kokoro-blend-b', b);
+      setBlendMethod('slerp');
+      setBlendRatio(ratio);
+      updateBlendButtons();
+      $$('.blend-preset-btn').forEach(b => b.classList.remove('active'));
+      toast(`${VOICE_META[a].name} + ${VOICE_META[b].name} @ ${ratio}%`, 'info');
     }
 
     // --- Blend Voice Picker ---
