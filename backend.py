@@ -137,6 +137,44 @@ def _voice_to_lang(voice_name: str) -> str:
     return VOICE_LANG_MAP.get(prefix, "en-us")
 
 
+# --- Voice blending (SLERP / LERP) ---
+
+def _slerp(v0: np.ndarray, v1: np.ndarray, t: float) -> np.ndarray:
+    """Spherical linear interpolation. t=0 returns v0, t=1 returns v1.
+    Works on 1-D vectors or 2-D arrays (row-wise)."""
+    v0 = v0.astype(np.float64)
+    v1 = v1.astype(np.float64)
+    if v0.ndim == 1:
+        n0, n1 = np.linalg.norm(v0), np.linalg.norm(v1)
+        dot = np.clip(np.dot(v0, v1) / (n0 * n1 + 1e-10), -1.0, 1.0)
+        omega = np.arccos(dot)
+        if abs(omega) < 1e-6:
+            return ((1.0 - t) * v0 + t * v1).astype(np.float32)
+        so = np.sin(omega)
+        return ((np.sin((1.0 - t) * omega) / so) * v0
+                + (np.sin(t * omega) / so) * v1).astype(np.float32)
+    # 2-D: row-wise
+    result = np.empty_like(v0)
+    for i in range(v0.shape[0]):
+        result[i] = _slerp(v0[i], v1[i], t)
+    return result.astype(np.float32)
+
+
+def _lerp(v0: np.ndarray, v1: np.ndarray, t: float) -> np.ndarray:
+    """Linear interpolation. t=0 returns v0, t=1 returns v1."""
+    return ((1.0 - t) * v0 + t * v1).astype(np.float32)
+
+
+def _blend_voices(kokoro_inst, voice_a: str, voice_b: str,
+                  ratio: float, method: str = "slerp") -> np.ndarray:
+    """Blend two voice embeddings. ratio: 0.0=100% A, 1.0=100% B."""
+    embed_a = kokoro_inst.get_voice_style(voice_a)
+    embed_b = kokoro_inst.get_voice_style(voice_b)
+    if method == "slerp":
+        return _slerp(embed_a, embed_b, ratio)
+    return _lerp(embed_a, embed_b, ratio)
+
+
 # Cached Kokoro instance (single model)
 kokoro_instance = None
 kokoro_lock = threading.Lock()
@@ -867,15 +905,18 @@ def download_model(model_id):
 
 # --- Chunked generation background worker ---
 
-def _background_chunked_generate(job_id, voice, sentences, speed,
-                                  max_silence_ms, prompt, basename):
+def _background_chunked_generate(job_id, voice_param, voice_name, sentences, speed,
+                                  max_silence_ms, prompt, basename,
+                                  voice_for_metadata=None, blend_meta=None):
     """Generate audio for each sentence chunk, concatenate, loudnorm, and save."""
     with generation_jobs_lock:
         job = generation_jobs[job_id]
     q = job["queue"]
+    if voice_for_metadata is None:
+        voice_for_metadata = voice_name
     try:
         kokoro = load_model()
-        lang = _voice_to_lang(voice)
+        lang = _voice_to_lang(voice_name)
 
         audio_chunks = []
         total = len(sentences)
@@ -894,7 +935,7 @@ def _background_chunked_generate(job_id, voice, sentences, speed,
 
             start = time.perf_counter()
             with generation_inference_lock:
-                chunk_audio, _sr = kokoro.create(text=block, voice=voice, speed=speed, lang=lang)
+                chunk_audio, _sr = kokoro.create(text=block, voice=voice_param, speed=speed, lang=lang)
             elapsed = time.perf_counter() - start
             total_inference += elapsed
             audio_chunks.append(chunk_audio)
@@ -929,7 +970,7 @@ def _background_chunked_generate(job_id, voice, sentences, speed,
             "prompt": clean_prompt,
             "model": "kokoro-v1.0",
             "model_id": "kokoro",
-            "voice": voice,
+            "voice": voice_for_metadata,
             "timestamp": datetime.now().isoformat(timespec="seconds"),
             "inference_time": round(total_inference, 3),
             "rtf": round(rtf, 4),
@@ -942,6 +983,8 @@ def _background_chunked_generate(job_id, voice, sentences, speed,
             "chunked": True,
             "num_chunks": total,
         }
+        if blend_meta:
+            metadata["blend"] = blend_meta
         # Set post-processing statuses before writing to disk
         metadata["alignment_status"] = "pending" if _check_alignment_available() else "unavailable"
         metadata["enhance_status"] = "pending" if _check_enhance_available() else "unavailable"
@@ -989,13 +1032,41 @@ def generate():
     speed = max(0.5, min(2.0, speed))  # clamp to 0.5–2.0
     max_silence_ms = int(data.get("max_silence_ms", 500))
     max_silence_ms = max(200, min(1000, max_silence_ms))  # clamp to 200–1000
+    blend = data.get("blend")  # optional: {voice_a, voice_b, ratio, method}
 
     if not prompt.strip():
         return jsonify({"error": "Prompt is required"}), 400
     if model_id not in MODELS:
         return jsonify({"error": "Unknown model"}), 404
-    if voice not in VOICES:
-        return jsonify({"error": f"Unknown voice. Choose from: {VOICES}"}), 400
+
+    # Resolve voice: single string or blended embedding
+    voice_for_metadata = voice
+    voice_param = voice  # what gets passed to kokoro.create()
+    blend_meta = None
+
+    if blend:
+        voice_a = blend.get("voice_a", "")
+        voice_b = blend.get("voice_b", "")
+        ratio = float(blend.get("ratio", 0.5))
+        ratio = max(0.0, min(1.0, ratio))
+        method = blend.get("method", "slerp")
+        if method not in ("slerp", "lerp"):
+            method = "slerp"
+        if voice_a not in VOICES:
+            return jsonify({"error": f"Unknown voice_a: {voice_a}"}), 400
+        if voice_b not in VOICES:
+            return jsonify({"error": f"Unknown voice_b: {voice_b}"}), 400
+
+        kokoro_inst = load_model()
+        voice_param = _blend_voices(kokoro_inst, voice_a, voice_b, ratio, method)
+        pct = int(round(ratio * 100))
+        voice_for_metadata = f"{voice_a} + {voice_b} ({pct}% {method.upper()})"
+        voice = voice_a  # used for lang derivation
+        blend_meta = {"voice_a": voice_a, "voice_b": voice_b,
+                      "ratio": ratio, "method": method}
+    else:
+        if voice not in VOICES:
+            return jsonify({"error": f"Unknown voice. Choose from: {VOICES}"}), 400
 
     # Reject if another generation is already running (prevents OOM from concurrent ONNX)
     with generation_jobs_lock:
@@ -1004,7 +1075,7 @@ def generate():
                 return jsonify({"error": "A generation is already in progress. Please wait or abort."}), 429
 
     kokoro = load_model()
-    logger.info("Generate  \033[1m{}\033[0m | {} | {} chars", model_id, voice, len(prompt))
+    logger.info("Generate  \033[1m{}\033[0m | {} | {} chars", model_id, voice_for_metadata, len(prompt))
 
     # If text is already bracket-formatted [block1]\n\n[block2], use those blocks directly
     pre_blocks = re.findall(r'\[([^\[\]]+)\]', prompt)
@@ -1037,8 +1108,9 @@ def generate():
             }
         t = threading.Thread(
             target=_background_chunked_generate,
-            args=(job_id, voice, blocks, speed,
-                  max_silence_ms, prompt, basename),
+            args=(job_id, voice_param, voice, blocks, speed,
+                  max_silence_ms, prompt, basename, voice_for_metadata,
+                  blend_meta),
             daemon=True,
         )
         t.start()
@@ -1056,7 +1128,7 @@ def generate():
     start = time.perf_counter()
     try:
         with generation_inference_lock:
-            audio, _sr = kokoro.create(text=single_block, voice=voice, speed=speed, lang=lang)
+            audio, _sr = kokoro.create(text=single_block, voice=voice_param, speed=speed, lang=lang)
     except Exception as e:
         logger.exception("TTS inference failed")
         return jsonify({"error": f"Generation failed: {e}"}), 500
@@ -1083,7 +1155,7 @@ def generate():
         "prompt": clean_prompt,
         "model": "kokoro-v1.0",
         "model_id": "kokoro",
-        "voice": voice,
+        "voice": voice_for_metadata,
         "timestamp": datetime.now().isoformat(timespec="seconds"),
         "inference_time": round(inference_time, 3),
         "rtf": round(rtf, 4),
@@ -1094,6 +1166,8 @@ def generate():
         "words": len(clean_prompt.split()),
         "approx_tokens": int(len(clean_prompt.split()) * 1.3),
     }
+    if blend_meta:
+        metadata["blend"] = blend_meta
     with open(os.path.join(job_dir, json_name), "w") as f:
         json.dump(metadata, f, indent=2)
 
@@ -1828,12 +1902,47 @@ def _load_enhance_model():
 
 
 def _run_enhance(wav_path):
-    """Enhance audio file. Returns enhanced filename or None."""
+    """Enhance audio file in chunks to avoid OOM on long audio. Returns enhanced filename or None."""
+    import gc
     try:
         model = _load_enhance_model()
         audio, sr = model.load_audio(wav_path)
-        enhanced = model.enhance(audio)
-        enhanced_np = enhanced.cpu().numpy().squeeze()
+
+        # Chunk parameters: 30s segments with 0.5s overlap for crossfade
+        CHUNK_SEC = 30
+        OVERLAP_SEC = 0.5
+        chunk_samples = int(sr * CHUNK_SEC)
+        overlap_samples = int(sr * OVERLAP_SEC)
+        total_samples = audio.shape[-1]
+
+        # Short audio — process in one shot
+        if total_samples <= chunk_samples + overlap_samples:
+            enhanced = model.enhance(audio)
+            enhanced_np = enhanced.cpu().numpy().squeeze()
+            del enhanced
+        else:
+            # Process in chunks to stay within memory limits
+            enhanced_chunks = []
+            pos = 0
+            while pos < total_samples:
+                end = min(pos + chunk_samples + overlap_samples, total_samples)
+                chunk = audio[:, pos:end] if audio.dim() == 2 else audio[pos:end].unsqueeze(0)
+                enh_chunk = model.enhance(chunk)
+                enhanced_chunks.append(enh_chunk.cpu().numpy().squeeze())
+                del enh_chunk, chunk
+                gc.collect()
+                try:
+                    import torch
+                    if hasattr(torch, 'cuda'):
+                        torch.cuda.empty_cache()
+                except Exception:
+                    pass
+                pos += chunk_samples  # advance by chunk_samples, leaving overlap for crossfade
+
+            # Crossfade-stitch enhanced chunks (output is 48kHz = 2x input SR)
+            enhanced_np = _stitch_enhanced_chunks(enhanced_chunks, overlap_samples * 2)
+            del enhanced_chunks
+            gc.collect()
 
         basename = os.path.splitext(os.path.basename(wav_path))[0]
         enhanced_name = f"{basename}_enhanced.wav"
@@ -1843,6 +1952,29 @@ def _run_enhance(wav_path):
     except Exception as e:
         logger.exception("Enhancement failed for {}", wav_path)
         return None
+
+
+def _stitch_enhanced_chunks(chunks, overlap_samples):
+    """Crossfade-stitch enhanced audio chunks at overlap boundaries."""
+    if len(chunks) == 1:
+        return chunks[0]
+    parts = []
+    for i, chunk in enumerate(chunks):
+        if i == 0:
+            # Keep everything except the trailing overlap half
+            parts.append(chunk)
+            continue
+        prev = parts[-1]
+        xfade = min(overlap_samples, len(prev), len(chunk))
+        if xfade > 0:
+            fade_out = np.linspace(1.0, 0.0, xfade, dtype=np.float32)
+            fade_in = np.linspace(0.0, 1.0, xfade, dtype=np.float32)
+            # Blend the overlap region
+            prev[-xfade:] = prev[-xfade:] * fade_out + chunk[:xfade] * fade_in
+            parts.append(chunk[xfade:])
+        else:
+            parts.append(chunk)
+    return np.concatenate(parts)
 
 
 def _background_enhance(basename):
@@ -1946,25 +2078,37 @@ def _load_vad_model():
 def _run_silence_removal(wav_path, max_silence_ms=500):
     """Remove silences longer than max_silence_ms using Silero VAD.
     Short pauses (<= threshold) are kept intact for natural speech."""
+    import gc
     try:
         import torch
         model, utils = _load_vad_model()
         get_speech_timestamps = utils[0]
 
+        # Free memory before loading audio (enhancement may have left residual tensors)
+        gc.collect()
+        try:
+            torch.cuda.empty_cache()
+        except Exception:
+            pass
+
         # Read audio with soundfile and resample to 16kHz (avoids torchaudio dependency)
         audio_np, sr = sf.read(wav_path, dtype="float32")
         if audio_np.ndim > 1:
             audio_np = audio_np.mean(axis=1)
-        orig_audio = audio_np.copy()
         orig_sr = sr
+
+        # Resample to 16kHz for VAD; keep reference to original
         if sr != 16000:
             target_len = int(len(audio_np) * 16000 / sr)
-            audio_np = np.interp(
+            audio_16k = np.interp(
                 np.linspace(0, len(audio_np), target_len, endpoint=False),
                 np.arange(len(audio_np)),
                 audio_np,
             ).astype(np.float32)
-        wav_16k = torch.from_numpy(audio_np)
+        else:
+            audio_16k = audio_np
+
+        wav_16k = torch.from_numpy(audio_16k)
         timestamps = get_speech_timestamps(
             wav_16k, model,
             sampling_rate=16000,
@@ -1972,6 +2116,9 @@ def _run_silence_removal(wav_path, max_silence_ms=500):
             min_speech_duration_ms=250,
             min_silence_duration_ms=100,
         )
+        # Free 16kHz copy
+        del wav_16k, audio_16k
+        gc.collect()
 
         if not timestamps:
             return None
@@ -1990,18 +2137,18 @@ def _run_silence_removal(wav_path, max_silence_ms=500):
                 gap_ms = ((start - prev_end) / orig_sr) * 1000
 
                 if gap_ms <= max_silence_ms:
-                    # Keep the silence — include gap + speech
-                    chunks.append(orig_audio[prev_end:end])
+                    chunks.append(audio_np[prev_end:end])
                 else:
-                    # Drop the long silence, just add speech segment
-                    chunks.append(orig_audio[start:end])
+                    chunks.append(audio_np[start:end])
             else:
-                chunks.append(orig_audio[start:end])
+                chunks.append(audio_np[start:end])
 
         if not chunks:
             return None
 
         cleaned = np.concatenate(chunks)
+        del audio_np, chunks
+        gc.collect()
         basename = os.path.splitext(os.path.basename(wav_path))[0]
         cleaned_name = f"{basename}_cleaned.wav"
         cleaned_path = os.path.join(os.path.dirname(wav_path), cleaned_name)
