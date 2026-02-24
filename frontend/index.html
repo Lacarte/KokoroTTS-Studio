@@ -365,19 +365,19 @@
     }
 
     .lang-tab.top-picks-tab {
-      background: linear-gradient(135deg, rgba(255,230,109,0.08), rgba(255,107,107,0.08));
-      border-color: rgba(255,230,109,0.3);
+      background: linear-gradient(135deg, rgba(255, 230, 109, 0.08), rgba(255, 107, 107, 0.08));
+      border-color: rgba(255, 230, 109, 0.3);
       color: #FFE66D;
     }
 
     .lang-tab.top-picks-tab:hover {
-      border-color: rgba(255,230,109,0.5);
+      border-color: rgba(255, 230, 109, 0.5);
       color: #FFE66D;
     }
 
     .lang-tab.top-picks-tab[data-active="true"] {
-      background: linear-gradient(135deg, rgba(255,230,109,0.15), rgba(255,107,107,0.12));
-      border-color: rgba(255,230,109,0.5);
+      background: linear-gradient(135deg, rgba(255, 230, 109, 0.15), rgba(255, 107, 107, 0.12));
+      border-color: rgba(255, 230, 109, 0.5);
       color: #FFE66D;
     }
 
@@ -404,7 +404,7 @@
     }
 
     .rec-voice-card[data-active="true"] {
-      background: linear-gradient(135deg, rgba(78,205,196,0.1), rgba(78,205,196,0.05));
+      background: linear-gradient(135deg, rgba(78, 205, 196, 0.1), rgba(78, 205, 196, 0.05));
       border-color: rgba(78, 205, 196, 0.4);
       box-shadow: 0 4px 16px rgba(78, 205, 196, 0.15);
     }
@@ -424,93 +424,166 @@
       border-color: var(--border-hover);
       color: var(--text-secondary);
     }
+
     #blend-toggle-btn[data-active="true"] {
       border-color: rgba(167, 139, 250, 0.4);
       background: rgba(167, 139, 250, 0.06);
       color: var(--text);
     }
+
     #blend-toggle-btn[data-active="true"] #blend-status-pill {
       background: rgba(167, 139, 250, 0.15);
       color: #A78BFA;
     }
+
     .blend-voice-btn {
-      width: 100%; padding: 10px 12px; border-radius: 8px;
-      border: 1.5px solid var(--border); background: var(--bg-darkest);
-      color: var(--text); font-size: 12px; font-weight: 500;
-      cursor: pointer; transition: all 0.2s; text-align: left;
-      font-family: inherit; display: flex; align-items: center; gap: 6px;
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 8px;
+      border: 1.5px solid var(--border);
+      background: var(--bg-darkest);
+      color: var(--text);
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-align: left;
+      font-family: inherit;
+      display: flex;
+      align-items: center;
+      gap: 6px;
     }
+
     .blend-voice-btn:hover {
       border-color: var(--border-hover);
       background: var(--bg-surface-hover);
     }
+
     #blend-slider {
-      width: 100%; -webkit-appearance: none; appearance: none;
-      height: 20px; background: transparent; cursor: pointer; margin: -10px 0;
+      width: 100%;
+      -webkit-appearance: none;
+      appearance: none;
+      height: 20px;
+      background: transparent;
+      cursor: pointer;
+      margin: -10px 0;
     }
+
     #blend-slider::-webkit-slider-thumb {
-      -webkit-appearance: none; appearance: none;
-      width: 16px; height: 16px; border-radius: 50%;
-      background: #A78BFA; cursor: pointer;
-      box-shadow: 0 2px 8px rgba(167,139,250,0.4);
+      -webkit-appearance: none;
+      appearance: none;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: #A78BFA;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(167, 139, 250, 0.4);
       border: 2px solid var(--bg-surface);
     }
+
     #blend-slider::-webkit-slider-thumb:hover {
       transform: scale(1.2);
-      box-shadow: 0 2px 12px rgba(167,139,250,0.6);
+      box-shadow: 0 2px 12px rgba(167, 139, 250, 0.6);
     }
+
     #blend-slider::-moz-range-thumb {
-      width: 16px; height: 16px; border-radius: 50%;
-      background: #A78BFA; cursor: pointer;
-      box-shadow: 0 2px 8px rgba(167,139,250,0.4);
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: #A78BFA;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(167, 139, 250, 0.4);
       border: 2px solid var(--bg-surface);
     }
+
     #blend-slider::-webkit-slider-runnable-track {
-      height: 4px; border-radius: 2px;
+      height: 4px;
+      border-radius: 2px;
       background: linear-gradient(to right, #FF7070, #A78BFA, #4ECDC4);
     }
+
     #blend-slider::-moz-range-track {
-      height: 4px; border-radius: 2px;
+      height: 4px;
+      border-radius: 2px;
       background: linear-gradient(to right, #FF7070, #A78BFA, #4ECDC4);
     }
+
     .blend-quick-btn {
-      flex: 1; padding: 4px 0; border-radius: 5px;
-      font-size: 9px; font-weight: 700;
+      flex: 1;
+      padding: 4px 0;
+      border-radius: 5px;
+      font-size: 9px;
+      font-weight: 700;
       font-family: 'JetBrains Mono', monospace;
-      border: 1px solid var(--border); background: var(--bg-darkest);
-      color: var(--text-muted); cursor: pointer; transition: all 0.15s;
+      border: 1px solid var(--border);
+      background: var(--bg-darkest);
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.15s;
     }
-    .blend-quick-btn:hover { border-color: var(--border-hover); color: var(--text-secondary); }
+
+    .blend-quick-btn:hover {
+      border-color: var(--border-hover);
+      color: var(--text-secondary);
+    }
+
     .blend-quick-btn.active {
-      background: rgba(167,139,250,0.12);
-      border-color: rgba(167,139,250,0.4);
+      background: rgba(167, 139, 250, 0.12);
+      border-color: rgba(167, 139, 250, 0.4);
       color: #A78BFA;
     }
+
     .blend-method-btn {
-      padding: 5px 12px; font-size: 10px; font-weight: 600;
+      padding: 5px 12px;
+      font-size: 10px;
+      font-weight: 600;
       font-family: 'JetBrains Mono', monospace;
-      border: none; cursor: pointer; transition: all 0.15s;
-      background: var(--bg-darkest); color: var(--text-muted);
+      border: none;
+      cursor: pointer;
+      transition: all 0.15s;
+      background: var(--bg-darkest);
+      color: var(--text-muted);
     }
-    .blend-method-btn:hover { color: var(--text-secondary); }
+
+    .blend-method-btn:hover {
+      color: var(--text-secondary);
+    }
+
     .blend-method-btn.active {
-      background: rgba(167,139,250,0.15); color: #A78BFA;
+      background: rgba(167, 139, 250, 0.15);
+      color: #A78BFA;
     }
+
     .blend-preset-btn {
-      padding: 8px 10px; border-radius: 7px; font-size: 11px; font-weight: 500;
-      border: 1px solid var(--border); background: var(--bg-darkest);
-      color: var(--text-secondary); cursor: pointer; transition: all 0.2s;
-      text-align: left; font-family: inherit;
+      padding: 8px 10px;
+      border-radius: 7px;
+      font-size: 11px;
+      font-weight: 500;
+      border: 1px solid var(--border);
+      background: var(--bg-darkest);
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.2s;
+      text-align: left;
+      font-family: inherit;
     }
+
     .blend-preset-btn:hover {
-      border-color: var(--border-hover); color: var(--text);
-      background: var(--bg-surface-hover); transform: translateY(-1px);
+      border-color: var(--border-hover);
+      color: var(--text);
+      background: var(--bg-surface-hover);
+      transform: translateY(-1px);
     }
+
     .blend-preset-btn.active {
-      border-color: rgba(167,139,250,0.4);
-      background: rgba(167,139,250,0.06);
+      border-color: rgba(167, 139, 250, 0.4);
+      background: rgba(167, 139, 250, 0.06);
     }
-    #blend-voice-picker .voice-chip { font-size: 12px; padding: 7px 12px; }
+
+    #blend-voice-picker .voice-chip {
+      font-size: 12px;
+      padding: 7px 12px;
+    }
 
     /* ---- Generate Button ---- */
     .gen-btn {
@@ -1690,7 +1763,7 @@
           viewBox="0 0 24 24">
           <path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z" />
         </svg>
-        <span class="nav-label">Library</span>
+        <span class="nav-label">LIBRARY</span>
       </button>
       <button class="nav-item" onclick="switchPage('settings')" data-page="settings">
         <svg class="nav-icon" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
@@ -1699,7 +1772,7 @@
           <path
             d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z" />
         </svg>
-        <span class="nav-label">Settings</span>
+        <span class="nav-label">SETTINGS</span>
       </button>
     </div>
 
@@ -1768,22 +1841,35 @@
           <p class="text-sm mt-1" style="color:var(--text-secondary)">Transform text into natural speech</p>
         </div>
 
-        <!-- Model Select -->
+        <!-- Model + Speed -->
         <section class="card p-5 mb-4 reveal" style="animation-delay:0.04s">
           <label class="block text-[10px] font-bold uppercase tracking-[0.15em] mb-2.5"
             style="color:var(--text-muted)">Model</label>
-          <div style="position:relative">
-            <select id="model-select" class="input-field"
-              style="width:100%;padding:11px 14px;padding-right:90px;font-size:13px;font-weight:500">
-              <option value="kokoro">Kokoro v1.0 — 82M</option>
-            </select>
-            <span id="model-size" class="font-mono"
-              style="position:absolute;right:32px;top:50%;transform:translateY(-50%);font-size:10px;font-weight:600;color:var(--accent);background:rgba(78,205,196,0.1);padding:2px 7px;border-radius:5px">~373MB</span>
-            <svg
-              style="position:absolute;right:12px;top:50%;transform:translateY(-50%);pointer-events:none;color:var(--text-muted)"
-              width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5">
-              <path d="M2 4l4 4 4-4" />
-            </svg>
+          <div class="flex items-center gap-3">
+            <div style="position:relative;flex:1">
+              <select id="model-select" class="input-field"
+                style="width:100%;padding:11px 14px;padding-right:90px;font-size:13px;font-weight:500">
+                <option value="kokoro">Kokoro v1.0 — 82M</option>
+              </select>
+              <span id="model-size" class="font-mono"
+                style="position:absolute;right:32px;top:50%;transform:translateY(-50%);font-size:10px;font-weight:600;color:var(--accent);background:rgba(78,205,196,0.1);padding:2px 7px;border-radius:5px">~373MB</span>
+              <svg
+                style="position:absolute;right:12px;top:50%;transform:translateY(-50%);pointer-events:none;color:var(--text-muted)"
+                width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5">
+                <path d="M2 4l4 4 4-4" />
+              </svg>
+            </div>
+            <div style="position:relative;min-width:80px">
+              <select id="speed-select" class="input-field"
+                style="width:100%;padding:11px 10px;padding-right:24px;font-size:12px;font-weight:600;font-family:'JetBrains Mono',monospace;text-align:center"
+                onchange="localStorage.setItem('kokoro-speed',this.value)">
+              </select>
+              <svg
+                style="position:absolute;right:6px;top:50%;transform:translateY(-50%);pointer-events:none;color:var(--text-muted)"
+                width="8" height="8" fill="none" stroke="currentColor" stroke-width="2.5">
+                <path d="M1 2.5l3 3 3-3" />
+              </svg>
+            </div>
           </div>
         </section>
 
@@ -1796,19 +1882,19 @@
 
           <!-- Voice Blend Toggle -->
           <div id="blend-toggle-row" style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border)">
-            <button id="blend-toggle-btn" data-active="false" onclick="toggleBlendMode()"
-              style="display:flex;align-items:center;gap:8px;padding:8px 14px;border-radius:8px;
+            <button id="blend-toggle-btn" data-active="false" onclick="toggleBlendMode()" style="display:flex;align-items:center;gap:8px;padding:8px 14px;border-radius:8px;
                      border:1.5px solid var(--border);background:var(--bg-darkest);
                      color:var(--text-muted);font-size:12px;font-weight:600;
                      cursor:pointer;transition:all 0.2s;width:100%;font-family:inherit">
-              <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8"
-                   stroke-linecap="round" viewBox="0 0 24 24">
-                <circle cx="6" cy="6" r="3"/><circle cx="18" cy="18" r="3"/>
-                <path d="M6 21V9a9 9 0 0 1 9 9"/><path d="M18 3v12a9 9 0 0 1-9-9"/>
+              <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+                viewBox="0 0 24 24">
+                <circle cx="6" cy="6" r="3" />
+                <circle cx="18" cy="18" r="3" />
+                <path d="M6 21V9a9 9 0 0 1 9 9" />
+                <path d="M18 3v12a9 9 0 0 1-9-9" />
               </svg>
               <span>Voice Blend</span>
-              <span id="blend-status-pill"
-                style="margin-left:auto;font-size:9px;font-weight:700;padding:2px 7px;
+              <span id="blend-status-pill" style="margin-left:auto;font-size:9px;font-weight:700;padding:2px 7px;
                        border-radius:5px;font-family:'JetBrains Mono',monospace;
                        background:rgba(78,205,196,0.1);color:var(--text-muted)">OFF</span>
             </button>
@@ -1822,23 +1908,27 @@
                 <label style="display:block;font-size:9px;font-weight:700;text-transform:uppercase;
                                letter-spacing:0.12em;color:var(--text-muted);margin-bottom:4px">Voice A</label>
                 <button id="blend-voice-a-btn" class="blend-voice-btn" onclick="openBlendPicker('a')">
-                  <span class="gender-dot" id="blend-a-dot" style="width:6px;height:6px;border-radius:50%;flex-shrink:0"></span>
+                  <span class="gender-dot" id="blend-a-dot"
+                    style="width:6px;height:6px;border-radius:50%;flex-shrink:0"></span>
                   <span id="blend-a-label">Heart</span>
                   <span id="blend-a-tag" class="gender-tag gender-f" style="margin-left:auto">F</span>
                 </button>
               </div>
               <div style="display:flex;align-items:center;justify-content:center;padding-bottom:8px">
                 <svg width="18" height="18" fill="none" stroke="var(--text-muted)" stroke-width="1.5"
-                     stroke-linecap="round" viewBox="0 0 24 24" style="opacity:0.4">
-                  <path d="M17 1l4 4-4 4"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/>
-                  <path d="M7 23l-4-4 4-4"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/>
+                  stroke-linecap="round" viewBox="0 0 24 24" style="opacity:0.4">
+                  <path d="M17 1l4 4-4 4" />
+                  <path d="M3 11V9a4 4 0 0 1 4-4h14" />
+                  <path d="M7 23l-4-4 4-4" />
+                  <path d="M21 13v2a4 4 0 0 1-4 4H3" />
                 </svg>
               </div>
               <div>
                 <label style="display:block;font-size:9px;font-weight:700;text-transform:uppercase;
                                letter-spacing:0.12em;color:var(--text-muted);margin-bottom:4px">Voice B</label>
                 <button id="blend-voice-b-btn" class="blend-voice-btn" onclick="openBlendPicker('b')">
-                  <span class="gender-dot" id="blend-b-dot" style="width:6px;height:6px;border-radius:50%;flex-shrink:0"></span>
+                  <span class="gender-dot" id="blend-b-dot"
+                    style="width:6px;height:6px;border-radius:50%;flex-shrink:0"></span>
                   <span id="blend-b-label">Adam</span>
                   <span id="blend-b-tag" class="gender-tag gender-m" style="margin-left:auto">M</span>
                 </button>
@@ -1850,14 +1940,12 @@
               <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
                 <label style="font-size:9px;font-weight:700;text-transform:uppercase;
                                letter-spacing:0.12em;color:var(--text-muted)">Blend Ratio</label>
-                <span id="blend-ratio-label" class="font-mono"
-                  style="font-size:11px;font-weight:600;color:#A78BFA">50 / 50</span>
+                <span id="blend-ratio-label" class="font-mono" style="font-size:11px;font-weight:600;color:#A78BFA">50 /
+                  50</span>
               </div>
-              <div id="blend-gradient-bar"
-                style="height:6px;border-radius:3px;margin-bottom:4px;
+              <div id="blend-gradient-bar" style="height:6px;border-radius:3px;margin-bottom:4px;
                        background:linear-gradient(to right, #FF7070, #A78BFA, #6FE3DA)"></div>
-              <input type="range" id="blend-slider" min="0" max="100" value="50"
-                oninput="updateBlendRatio(this.value)">
+              <input type="range" id="blend-slider" min="0" max="100" value="50" oninput="updateBlendRatio(this.value)">
               <div style="display:flex;gap:4px;margin-top:6px">
                 <button onclick="setBlendRatio(0)" class="blend-quick-btn">0%</button>
                 <button onclick="setBlendRatio(25)" class="blend-quick-btn">25%</button>
@@ -1872,10 +1960,12 @@
               <label style="font-size:9px;font-weight:700;text-transform:uppercase;
                              letter-spacing:0.12em;color:var(--text-muted)">Method</label>
               <div style="display:flex;border-radius:6px;border:1.5px solid var(--border);overflow:hidden">
-                <button onclick="setBlendMethod('slerp')" data-method="slerp" class="blend-method-btn active">SLERP</button>
+                <button onclick="setBlendMethod('slerp')" data-method="slerp"
+                  class="blend-method-btn active">SLERP</button>
                 <button onclick="setBlendMethod('lerp')" data-method="lerp" class="blend-method-btn">LERP</button>
               </div>
-              <span style="font-size:9px;color:var(--text-muted);opacity:0.6" id="blend-method-desc">Spherical interpolation</span>
+              <span style="font-size:9px;color:var(--text-muted);opacity:0.6" id="blend-method-desc">Spherical
+                interpolation</span>
             </div>
 
             <!-- Quick Presets -->
@@ -1896,20 +1986,19 @@
                       box-shadow:0 24px 64px rgba(0,0,0,0.5)">
             <div style="padding:16px 18px 12px;border-bottom:1px solid var(--border);
                         display:flex;justify-content:space-between;align-items:center">
-              <span id="blend-picker-title" style="font-size:13px;font-weight:600;color:var(--text)">Select Voice A</span>
-              <button onclick="closeBlendPicker()"
-                style="width:28px;height:28px;border-radius:7px;border:none;
+              <span id="blend-picker-title" style="font-size:13px;font-weight:600;color:var(--text)">Select Voice
+                A</span>
+              <button onclick="closeBlendPicker()" style="width:28px;height:28px;border-radius:7px;border:none;
                        background:rgba(255,107,107,0.1);color:var(--coral);cursor:pointer;
                        display:flex;align-items:center;justify-content:center;font-family:inherit">
-                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"
-                     stroke-linecap="round" viewBox="0 0 24 24">
-                  <path d="M18 6L6 18M6 6l12 12"/>
+                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                  viewBox="0 0 24 24">
+                  <path d="M18 6L6 18M6 6l12 12" />
                 </svg>
               </button>
             </div>
             <div id="blend-picker-tabs" style="padding:8px 18px;display:flex;flex-wrap:wrap;gap:4px"></div>
-            <div id="blend-picker-grid"
-              style="padding:8px 18px 16px;overflow-y:auto;max-height:45vh;
+            <div id="blend-picker-grid" style="padding:8px 18px 16px;overflow-y:auto;max-height:45vh;
                      display:flex;flex-wrap:wrap;gap:6px"></div>
           </div>
         </div>
@@ -2139,23 +2228,6 @@
           <h2 class="font-display text-2xl font-bold tracking-tight" style="color:var(--text)">Settings</h2>
           <p class="text-sm mt-1" style="color:var(--text-secondary)">Configure generation parameters</p>
         </div>
-
-        <!-- Speed -->
-        <section class="card p-5 mb-4">
-          <label class="block text-[10px] font-bold uppercase tracking-[0.15em] mb-2.5"
-            style="color:var(--text-muted)">Speed</label>
-          <div style="position:relative">
-            <select id="speed-select" class="input-field"
-              style="width:100%;padding:11px 14px;padding-right:32px;font-size:13px;font-weight:500;font-family:'JetBrains Mono',monospace"
-              onchange="localStorage.setItem('kokoro-speed',this.value)">
-            </select>
-            <svg
-              style="position:absolute;right:12px;top:50%;transform:translateY(-50%);pointer-events:none;color:var(--text-muted)"
-              width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.5">
-              <path d="M1.5 3.5l3.5 3.5 3.5-3.5" />
-            </svg>
-          </div>
-        </section>
 
         <!-- Silence Threshold -->
         <section id="silence-select-wrap" class="card p-5 mb-4" style="display:none">
@@ -2420,81 +2492,81 @@
     };
     const VOICE_META = {
       // American Female — coral/pink
-      af_alloy:   { g:'f', hue:'#FF9B9B', lang:'en-us', name:'Alloy', desc:'Neutral, versatile' },
-      af_aoede:   { g:'f', hue:'#FFB5B5', lang:'en-us', name:'Aoede', desc:'Soft, melodic' },
-      af_bella:   { g:'f', hue:'#FF8A8A', lang:'en-us', name:'Bella', desc:'Energetic, engaging' },
-      af_heart:   { g:'f', hue:'#FF7070', lang:'en-us', name:'Heart', desc:'Warm, friendly, natural' },
-      af_jessica: { g:'f', hue:'#FFA5A5', lang:'en-us', name:'Jessica', desc:'Bright, conversational' },
-      af_kore:    { g:'f', hue:'#FFCECE', lang:'en-us', name:'Kore', desc:'Gentle, soothing' },
-      af_nicole:  { g:'f', hue:'#FF8080', lang:'en-us', name:'Nicole', desc:'Clear, professional' },
-      af_nova:    { g:'f', hue:'#FFD0D0', lang:'en-us', name:'Nova', desc:'Bright, modern' },
-      af_river:   { g:'f', hue:'#FFB0B0', lang:'en-us', name:'River', desc:'Calm, flowing' },
-      af_sarah:   { g:'f', hue:'#FF9595', lang:'en-us', name:'Sarah', desc:'Smooth, balanced' },
-      af_sky:     { g:'f', hue:'#FFBABA', lang:'en-us', name:'Sky', desc:'Light, airy' },
+      af_alloy: { g: 'f', hue: '#FF9B9B', lang: 'en-us', name: 'Alloy', desc: 'Neutral, versatile' },
+      af_aoede: { g: 'f', hue: '#FFB5B5', lang: 'en-us', name: 'Aoede', desc: 'Soft, melodic' },
+      af_bella: { g: 'f', hue: '#FF8A8A', lang: 'en-us', name: 'Bella', desc: 'Energetic, engaging' },
+      af_heart: { g: 'f', hue: '#FF7070', lang: 'en-us', name: 'Heart', desc: 'Warm, friendly, natural' },
+      af_jessica: { g: 'f', hue: '#FFA5A5', lang: 'en-us', name: 'Jessica', desc: 'Bright, conversational' },
+      af_kore: { g: 'f', hue: '#FFCECE', lang: 'en-us', name: 'Kore', desc: 'Gentle, soothing' },
+      af_nicole: { g: 'f', hue: '#FF8080', lang: 'en-us', name: 'Nicole', desc: 'Clear, professional' },
+      af_nova: { g: 'f', hue: '#FFD0D0', lang: 'en-us', name: 'Nova', desc: 'Bright, modern' },
+      af_river: { g: 'f', hue: '#FFB0B0', lang: 'en-us', name: 'River', desc: 'Calm, flowing' },
+      af_sarah: { g: 'f', hue: '#FF9595', lang: 'en-us', name: 'Sarah', desc: 'Smooth, balanced' },
+      af_sky: { g: 'f', hue: '#FFBABA', lang: 'en-us', name: 'Sky', desc: 'Light, airy' },
       // American Male — teal
-      am_adam:    { g:'m', hue:'#6FE3DA', lang:'en-us', name:'Adam', desc:'Warm, approachable' },
-      am_echo:    { g:'m', hue:'#5ED5CC', lang:'en-us', name:'Echo', desc:'Resonant, clear' },
-      am_eric:    { g:'m', hue:'#7EEFEA', lang:'en-us', name:'Eric', desc:'Confident, steady' },
-      am_fenrir:  { g:'m', hue:'#4ECDC4', lang:'en-us', name:'Fenrir', desc:'Bold, dynamic' },
-      am_liam:    { g:'m', hue:'#6DE0D8', lang:'en-us', name:'Liam', desc:'Friendly, casual' },
-      am_michael: { g:'m', hue:'#8AF0E8', lang:'en-us', name:'Michael', desc:'Deep, authoritative' },
-      am_onyx:    { g:'m', hue:'#5CD8D0', lang:'en-us', name:'Onyx', desc:'Rich, powerful' },
-      am_puck:    { g:'m', hue:'#7AE8E0', lang:'en-us', name:'Puck', desc:'Playful, expressive' },
+      am_adam: { g: 'm', hue: '#6FE3DA', lang: 'en-us', name: 'Adam', desc: 'Warm, approachable' },
+      am_echo: { g: 'm', hue: '#5ED5CC', lang: 'en-us', name: 'Echo', desc: 'Resonant, clear' },
+      am_eric: { g: 'm', hue: '#7EEFEA', lang: 'en-us', name: 'Eric', desc: 'Confident, steady' },
+      am_fenrir: { g: 'm', hue: '#4ECDC4', lang: 'en-us', name: 'Fenrir', desc: 'Bold, dynamic' },
+      am_liam: { g: 'm', hue: '#6DE0D8', lang: 'en-us', name: 'Liam', desc: 'Friendly, casual' },
+      am_michael: { g: 'm', hue: '#8AF0E8', lang: 'en-us', name: 'Michael', desc: 'Deep, authoritative' },
+      am_onyx: { g: 'm', hue: '#5CD8D0', lang: 'en-us', name: 'Onyx', desc: 'Rich, powerful' },
+      am_puck: { g: 'm', hue: '#7AE8E0', lang: 'en-us', name: 'Puck', desc: 'Playful, expressive' },
       // British Female — purple/lavender
-      bf_alice:    { g:'f', hue:'#C4B5FD', lang:'en-gb', name:'Alice', desc:'Refined, poised' },
-      bf_emma:     { g:'f', hue:'#D4C5FF', lang:'en-gb', name:'Emma', desc:'Elegant, articulate' },
-      bf_isabella: { g:'f', hue:'#B4A5ED', lang:'en-gb', name:'Isabella', desc:'Graceful, warm' },
-      bf_lily:     { g:'f', hue:'#E4D5FF', lang:'en-gb', name:'Lily', desc:'Soft, gentle' },
+      bf_alice: { g: 'f', hue: '#C4B5FD', lang: 'en-gb', name: 'Alice', desc: 'Refined, poised' },
+      bf_emma: { g: 'f', hue: '#D4C5FF', lang: 'en-gb', name: 'Emma', desc: 'Elegant, articulate' },
+      bf_isabella: { g: 'f', hue: '#B4A5ED', lang: 'en-gb', name: 'Isabella', desc: 'Graceful, warm' },
+      bf_lily: { g: 'f', hue: '#E4D5FF', lang: 'en-gb', name: 'Lily', desc: 'Soft, gentle' },
       // British Male — steel blue
-      bm_daniel: { g:'m', hue:'#7B90A9', lang:'en-gb', name:'Daniel', desc:'Composed, clear' },
-      bm_fable:  { g:'m', hue:'#8BA0B9', lang:'en-gb', name:'Fable', desc:'Storytelling, warm' },
-      bm_george: { g:'m', hue:'#6B80A0', lang:'en-gb', name:'George', desc:'Classic narrator' },
-      bm_lewis:  { g:'m', hue:'#9BB0C9', lang:'en-gb', name:'Lewis', desc:'Thoughtful, measured' },
+      bm_daniel: { g: 'm', hue: '#7B90A9', lang: 'en-gb', name: 'Daniel', desc: 'Composed, clear' },
+      bm_fable: { g: 'm', hue: '#8BA0B9', lang: 'en-gb', name: 'Fable', desc: 'Storytelling, warm' },
+      bm_george: { g: 'm', hue: '#6B80A0', lang: 'en-gb', name: 'George', desc: 'Classic narrator' },
+      bm_lewis: { g: 'm', hue: '#9BB0C9', lang: 'en-gb', name: 'Lewis', desc: 'Thoughtful, measured' },
       // Japanese — sakura pink / muted blue
-      jf_alpha:      { g:'f', hue:'#FFB7C5', lang:'ja', name:'Alpha', desc:'Clear, natural' },
-      jf_gongitsune: { g:'f', hue:'#FFC7D5', lang:'ja', name:'Gongitsune', desc:'Gentle, expressive' },
-      jf_nezumi:     { g:'f', hue:'#FFD7E5', lang:'ja', name:'Nezumi', desc:'Soft, delicate' },
-      jf_tebukuro:   { g:'f', hue:'#FFA7B5', lang:'ja', name:'Tebukuro', desc:'Warm, friendly' },
-      jm_kumo:       { g:'m', hue:'#A0B4C8', lang:'ja', name:'Kumo', desc:'Calm, steady' },
+      jf_alpha: { g: 'f', hue: '#FFB7C5', lang: 'ja', name: 'Alpha', desc: 'Clear, natural' },
+      jf_gongitsune: { g: 'f', hue: '#FFC7D5', lang: 'ja', name: 'Gongitsune', desc: 'Gentle, expressive' },
+      jf_nezumi: { g: 'f', hue: '#FFD7E5', lang: 'ja', name: 'Nezumi', desc: 'Soft, delicate' },
+      jf_tebukuro: { g: 'f', hue: '#FFA7B5', lang: 'ja', name: 'Tebukuro', desc: 'Warm, friendly' },
+      jm_kumo: { g: 'm', hue: '#A0B4C8', lang: 'ja', name: 'Kumo', desc: 'Calm, steady' },
       // Chinese — gold
-      zf_xiaobei:  { g:'f', hue:'#FFD700', lang:'zh', name:'Xiaobei', desc:'Bright, cheerful' },
-      zf_xiaoni:   { g:'f', hue:'#FFE740', lang:'zh', name:'Xiaoni', desc:'Warm, gentle' },
-      zf_xiaoxuan: { g:'f', hue:'#FFC800', lang:'zh', name:'Xiaoxuan', desc:'Clear, professional' },
-      zf_xiaoyi:   { g:'f', hue:'#FFF060', lang:'zh', name:'Xiaoyi', desc:'Soft, soothing' },
-      zm_yunjian:  { g:'m', hue:'#E8B800', lang:'zh', name:'Yunjian', desc:'Strong, commanding' },
-      zm_yunxi:    { g:'m', hue:'#D8A800', lang:'zh', name:'Yunxi', desc:'Warm, rich' },
-      zm_yunxia:   { g:'m', hue:'#C89800', lang:'zh', name:'Yunxia', desc:'Smooth, mellow' },
-      zm_yunyang:  { g:'m', hue:'#F0C000', lang:'zh', name:'Yunyang', desc:'Energetic, bright' },
+      zf_xiaobei: { g: 'f', hue: '#FFD700', lang: 'zh', name: 'Xiaobei', desc: 'Bright, cheerful' },
+      zf_xiaoni: { g: 'f', hue: '#FFE740', lang: 'zh', name: 'Xiaoni', desc: 'Warm, gentle' },
+      zf_xiaoxuan: { g: 'f', hue: '#FFC800', lang: 'zh', name: 'Xiaoxuan', desc: 'Clear, professional' },
+      zf_xiaoyi: { g: 'f', hue: '#FFF060', lang: 'zh', name: 'Xiaoyi', desc: 'Soft, soothing' },
+      zm_yunjian: { g: 'm', hue: '#E8B800', lang: 'zh', name: 'Yunjian', desc: 'Strong, commanding' },
+      zm_yunxi: { g: 'm', hue: '#D8A800', lang: 'zh', name: 'Yunxi', desc: 'Warm, rich' },
+      zm_yunxia: { g: 'm', hue: '#C89800', lang: 'zh', name: 'Yunxia', desc: 'Smooth, mellow' },
+      zm_yunyang: { g: 'm', hue: '#F0C000', lang: 'zh', name: 'Yunyang', desc: 'Energetic, bright' },
       // Spanish — warm orange
-      ef_dora:  { g:'f', hue:'#FFB074', lang:'es', name:'Dora', desc:'Warm, expressive' },
-      em_alex:  { g:'m', hue:'#FFA060', lang:'es', name:'Alex', desc:'Clear, confident' },
-      em_santa: { g:'m', hue:'#FF9050', lang:'es', name:'Santa', desc:'Rich, resonant' },
+      ef_dora: { g: 'f', hue: '#FFB074', lang: 'es', name: 'Dora', desc: 'Warm, expressive' },
+      em_alex: { g: 'm', hue: '#FFA060', lang: 'es', name: 'Alex', desc: 'Clear, confident' },
+      em_santa: { g: 'm', hue: '#FF9050', lang: 'es', name: 'Santa', desc: 'Rich, resonant' },
       // French — soft mauve
-      ff_siwis: { g:'f', hue:'#D4A0D0', lang:'fr', name:'Siwis', desc:'Elegant, smooth' },
+      ff_siwis: { g: 'f', hue: '#D4A0D0', lang: 'fr', name: 'Siwis', desc: 'Elegant, smooth' },
       // Hindi — saffron
-      hf_alpha: { g:'f', hue:'#FFB347', lang:'hi', name:'Alpha', desc:'Clear, natural' },
-      hf_beta:  { g:'f', hue:'#FFC370', lang:'hi', name:'Beta', desc:'Warm, gentle' },
-      hm_omega: { g:'m', hue:'#E0A030', lang:'hi', name:'Omega', desc:'Deep, steady' },
-      hm_psi:   { g:'m', hue:'#D09020', lang:'hi', name:'Psi', desc:'Rich, expressive' },
+      hf_alpha: { g: 'f', hue: '#FFB347', lang: 'hi', name: 'Alpha', desc: 'Clear, natural' },
+      hf_beta: { g: 'f', hue: '#FFC370', lang: 'hi', name: 'Beta', desc: 'Warm, gentle' },
+      hm_omega: { g: 'm', hue: '#E0A030', lang: 'hi', name: 'Omega', desc: 'Deep, steady' },
+      hm_psi: { g: 'm', hue: '#D09020', lang: 'hi', name: 'Psi', desc: 'Rich, expressive' },
       // Italian — warm green
-      if_sara:   { g:'f', hue:'#90D890', lang:'it', name:'Sara', desc:'Warm, melodic' },
-      im_nicola: { g:'m', hue:'#70C870', lang:'it', name:'Nicola', desc:'Clear, engaging' },
+      if_sara: { g: 'f', hue: '#90D890', lang: 'it', name: 'Sara', desc: 'Warm, melodic' },
+      im_nicola: { g: 'm', hue: '#70C870', lang: 'it', name: 'Nicola', desc: 'Clear, engaging' },
       // Portuguese — ocean blue
-      pf_dora:  { g:'f', hue:'#70B0E0', lang:'pt-br', name:'Dora', desc:'Bright, friendly' },
-      pm_alex:  { g:'m', hue:'#60A0D0', lang:'pt-br', name:'Alex', desc:'Warm, clear' },
-      pm_santa: { g:'m', hue:'#5090C0', lang:'pt-br', name:'Santa', desc:'Deep, resonant' },
+      pf_dora: { g: 'f', hue: '#70B0E0', lang: 'pt-br', name: 'Dora', desc: 'Bright, friendly' },
+      pm_alex: { g: 'm', hue: '#60A0D0', lang: 'pt-br', name: 'Alex', desc: 'Warm, clear' },
+      pm_santa: { g: 'm', hue: '#5090C0', lang: 'pt-br', name: 'Santa', desc: 'Deep, resonant' },
     };
 
     // Top picks for narrative / audiobooks
     const TOP_PICKS = [
-      { voice:'af_heart',  badge:'#1 Narration', bestFor:'Audiobooks, narration, general purpose' },
-      { voice:'af_bella',  badge:'Dynamic', bestFor:'Dynamic narration, marketing' },
-      { voice:'af_nicole', badge:'Professional', bestFor:'Non-fiction, tutorials, professional' },
-      { voice:'af_sarah',  badge:'Versatile', bestFor:'General audiobooks, balanced delivery' },
-      { voice:'am_adam',   badge:'Male Lead', bestFor:'Male narration, approachable tone' },
-      { voice:'am_michael',badge:'Authoritative', bestFor:'Deep narration, documentary' },
-      { voice:'bf_emma',   badge:'British', bestFor:'British female, elegant narration' },
-      { voice:'bm_george', badge:'Classic', bestFor:'British male, classic narrator' },
+      { voice: 'af_heart', badge: '#1 Narration', bestFor: 'Audiobooks, narration, general purpose' },
+      { voice: 'af_bella', badge: 'Dynamic', bestFor: 'Dynamic narration, marketing' },
+      { voice: 'af_nicole', badge: 'Professional', bestFor: 'Non-fiction, tutorials, professional' },
+      { voice: 'af_sarah', badge: 'Versatile', bestFor: 'General audiobooks, balanced delivery' },
+      { voice: 'am_adam', badge: 'Male Lead', bestFor: 'Male narration, approachable tone' },
+      { voice: 'am_michael', badge: 'Authoritative', bestFor: 'Deep narration, documentary' },
+      { voice: 'bf_emma', badge: 'British', bestFor: 'British female, elegant narration' },
+      { voice: 'bm_george', badge: 'Classic', bestFor: 'British male, classic narrator' },
     ];
 
     // ======================================================================
@@ -2616,7 +2688,7 @@
     function renderLangTabs() {
       const tabs = $('#lang-tabs'); tabs.innerHTML = '';
       const groups = buildVoiceGroups();
-      const langOrder = ['en-us','en-gb','ja','zh','es','fr','hi','it','pt-br'];
+      const langOrder = ['en-us', 'en-gb', 'ja', 'zh', 'es', 'fr', 'hi', 'it', 'pt-br'];
       const sortedLangs = Object.keys(groups).sort((a, b) => {
         const ia = langOrder.indexOf(a), ib = langOrder.indexOf(b);
         return (ia === -1 ? 99 : ia) - (ib === -1 ? 99 : ib);
@@ -2689,7 +2761,7 @@
 
     function renderTopPicks(container) {
       TOP_PICKS.forEach((pick, idx) => {
-        const meta = VOICE_META[pick.voice] || { g:'m', hue:'#AAB8CC', name: pick.voice, desc:'' };
+        const meta = VOICE_META[pick.voice] || { g: 'm', hue: '#AAB8CC', name: pick.voice, desc: '' };
         const card = document.createElement('button');
         card.className = 'rec-voice-card';
         card.dataset.voice = pick.voice;
@@ -2736,12 +2808,12 @@
     // Voice Blend
     // ======================================================================
     const BLEND_PRESETS = [
-      { name: 'Narrator',    a: 'af_heart',   b: 'am_michael', ratio: 35, desc: 'Warm + authoritative' },
-      { name: 'Podcast',     a: 'af_bella',   b: 'am_adam',    ratio: 50, desc: 'Energetic duo' },
-      { name: 'Storyteller', a: 'bf_emma',    b: 'bm_fable',   ratio: 40, desc: 'British elegance' },
-      { name: 'Newscast',    a: 'af_nicole',  b: 'am_eric',    ratio: 30, desc: 'Clear + confident' },
-      { name: 'Gentle',      a: 'af_kore',    b: 'af_river',   ratio: 50, desc: 'Soothing blend' },
-      { name: 'Bold',        a: 'am_fenrir',  b: 'am_onyx',    ratio: 50, desc: 'Dynamic power' },
+      { name: 'Narrator', a: 'af_heart', b: 'am_michael', ratio: 35, desc: 'Warm + authoritative' },
+      { name: 'Podcast', a: 'af_bella', b: 'am_adam', ratio: 50, desc: 'Energetic duo' },
+      { name: 'Storyteller', a: 'bf_emma', b: 'bm_fable', ratio: 40, desc: 'British elegance' },
+      { name: 'Newscast', a: 'af_nicole', b: 'am_eric', ratio: 30, desc: 'Clear + confident' },
+      { name: 'Gentle', a: 'af_kore', b: 'af_river', ratio: 50, desc: 'Soothing blend' },
+      { name: 'Bold', a: 'am_fenrir', b: 'am_onyx', ratio: 50, desc: 'Dynamic power' },
     ];
 
     function toggleBlendMode() {
@@ -2776,13 +2848,13 @@
     }
 
     function updateBlendButtons() {
-      const metaA = VOICE_META[STATE.blendVoiceA] || { g:'m', hue:'#AAB8CC', name: STATE.blendVoiceA };
+      const metaA = VOICE_META[STATE.blendVoiceA] || { g: 'm', hue: '#AAB8CC', name: STATE.blendVoiceA };
       $('#blend-a-dot').style.background = metaA.hue;
       $('#blend-a-label').textContent = metaA.name || STATE.blendVoiceA;
       $('#blend-a-tag').className = `gender-tag gender-${metaA.g}`;
       $('#blend-a-tag').textContent = metaA.g === 'f' ? 'F' : 'M';
 
-      const metaB = VOICE_META[STATE.blendVoiceB] || { g:'m', hue:'#AAB8CC', name: STATE.blendVoiceB };
+      const metaB = VOICE_META[STATE.blendVoiceB] || { g: 'm', hue: '#AAB8CC', name: STATE.blendVoiceB };
       $('#blend-b-dot').style.background = metaB.hue;
       $('#blend-b-label').textContent = metaB.name || STATE.blendVoiceB;
       $('#blend-b-tag').className = `gender-tag gender-${metaB.g}`;
@@ -2874,10 +2946,10 @@
     function renderBlendPickerTabs() {
       const tabs = $('#blend-picker-tabs'); tabs.innerHTML = '';
       const groups = buildVoiceGroups();
-      const langOrder = ['en-us','en-gb','ja','zh','es','fr','hi','it','pt-br'];
+      const langOrder = ['en-us', 'en-gb', 'ja', 'zh', 'es', 'fr', 'hi', 'it', 'pt-br'];
       const LANG_SHORT = {
-        'en-us':'US','en-gb':'UK','ja':'JA','zh':'ZH','es':'ES',
-        'fr':'FR','hi':'HI','it':'IT','pt-br':'PT'
+        'en-us': 'US', 'en-gb': 'UK', 'ja': 'JA', 'zh': 'ZH', 'es': 'ES',
+        'fr': 'FR', 'hi': 'HI', 'it': 'IT', 'pt-br': 'PT'
       };
       const sortedLangs = Object.keys(groups).sort((a, b) => {
         const ia = langOrder.indexOf(a), ib = langOrder.indexOf(b);
@@ -2906,7 +2978,7 @@
       const voices = groups[_blendPickerLang] || [];
       const currentVoice = STATE.blendPickerTarget === 'a' ? STATE.blendVoiceA : STATE.blendVoiceB;
       voices.forEach(v => {
-        const meta = VOICE_META[v] || { g:'m', hue:'#AAB8CC' };
+        const meta = VOICE_META[v] || { g: 'm', hue: '#AAB8CC' };
         const chip = document.createElement('button');
         chip.className = 'voice-chip';
         chip.dataset.voice = v;

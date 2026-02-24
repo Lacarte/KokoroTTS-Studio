@@ -1632,8 +1632,7 @@ def get_enhance_status(filename):
         return jsonify({"status": "enhancing"})
 
     if status == "failed":
-        _start_enhancement(basename)
-        return jsonify({"status": "enhancing"})
+        return jsonify({"status": "failed"})
 
     if status == "enhancing":
         with enhance_tasks_lock:
@@ -1681,8 +1680,7 @@ def get_vad_status(filename):
         return jsonify({"status": "cleaning"})
 
     if status == "failed":
-        _start_vad(basename)
-        return jsonify({"status": "cleaning"})
+        return jsonify({"status": "failed"})
 
     if status == "normalizing":
         return jsonify({"status": "normalizing"})
@@ -1747,7 +1745,7 @@ def _run_alignment(wav_path, prompt_text):
             target_len = int(len(audio) * 16000 / sr)
             audio = np.interp(
                 np.linspace(0, len(audio), target_len, endpoint=False),
-                np.arange(len(audio)),
+                np.arange(len(audio), dtype=np.float32),
                 audio,
             ).astype(np.float32)
         result = model.align(audio, prompt_text, language="en", fast_mode=True)
@@ -1905,6 +1903,14 @@ def _run_enhance(wav_path):
     """Enhance audio file in chunks to avoid OOM on long audio. Returns enhanced filename or None."""
     import gc
     try:
+        gc.collect()
+        try:
+            import torch
+            if hasattr(torch, 'cuda'):
+                torch.cuda.empty_cache()
+        except Exception:
+            pass
+
         model = _load_enhance_model()
         audio, sr = model.load_audio(wav_path)
 
@@ -2102,7 +2108,7 @@ def _run_silence_removal(wav_path, max_silence_ms=500):
             target_len = int(len(audio_np) * 16000 / sr)
             audio_16k = np.interp(
                 np.linspace(0, len(audio_np), target_len, endpoint=False),
-                np.arange(len(audio_np)),
+                np.arange(len(audio_np), dtype=np.float32),
                 audio_np,
             ).astype(np.float32)
         else:
