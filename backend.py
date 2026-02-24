@@ -2439,17 +2439,11 @@ if __name__ == "__main__":
 
     port = args.port if args.port else find_available_port(5000)
 
-    # Startup banner (ASCII-safe for Windows cp1252 console)
-    W = 42  # inner width between pipes
-    url = f"http://localhost:{port}"
-    voices = f"Voices:  {len(VOICES)} available"
+    # Startup banner
     print()
-    print(f"  \033[96m+{'-' * W}+\033[0m")
-    print(f"  \033[96m|\033[0m  \033[1m{'Kokoro TTS Studio':<{W - 2}}\033[0m\033[96m|\033[0m")
-    print(f"  \033[96m|\033[0m{' ' * W}\033[96m|\033[0m")
-    print(f"  \033[96m|\033[0m  \033[92m>\033[0m  {url:<{W - 5}}\033[96m|\033[0m")
-    print(f"  \033[96m|\033[0m  \033[90m-\033[0m  {voices:<{W - 5}}\033[96m|\033[0m")
-    print(f"  \033[96m+{'-' * W}+\033[0m")
+    print(f"  \033[1mKokoro TTS Studio\033[0m")
+    print(f"  \033[92m>\033[0m http://localhost:{port}")
+    print(f"  \033[90m-\033[0m Voices: {len(VOICES)} available")
     print()
 
     app.run(host="0.0.0.0", port=port, debug=False, threaded=True)

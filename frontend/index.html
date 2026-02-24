@@ -2139,6 +2139,17 @@
             onclick="setHistFilter('tts')">#TTS</button>
           <button class="hist-filter-btn align-filter" data-filter="align" data-active="false"
             onclick="setHistFilter('align')">#ALIGNMENT</button>
+          <div style="margin-left:auto;position:relative">
+            <svg width="13" height="13" fill="none" stroke="var(--text-muted)" stroke-width="2" stroke-linecap="round"
+              viewBox="0 0 24 24" style="position:absolute;left:10px;top:50%;transform:translateY(-50%);pointer-events:none">
+              <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+            </svg>
+            <input id="history-search" type="text" placeholder="Search..." oninput="renderHistory()"
+              style="width:160px;padding:6px 10px 6px 30px;border-radius:7px;border:1px solid var(--border);
+                     background:var(--bg-darkest);color:var(--text);font-size:12px;font-family:inherit;
+                     outline:none;transition:border-color 0.2s"
+              onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border)'">
+          </div>
         </div>
         <div id="history-list" style="max-height:calc(100vh - 240px);overflow-y:auto;padding-right:4px">
           <div id="history-empty" style="text-align:center;padding:48px 24px">
@@ -4047,10 +4058,20 @@
       const list = $('#history-list');
       const emptyHTML = `<div style="text-align:center;padding:48px 24px"><svg width="64" height="64" fill="none" viewBox="0 0 64 64" style="margin:0 auto 16px;opacity:0.25;color:var(--text-muted)"><rect x="24" y="8" width="16" height="28" rx="8" stroke="currentColor" stroke-width="2"/><path d="M16 28c0 8.8 7.2 16 16 16s16-7.2 16-16" stroke="currentColor" stroke-width="2"/><line x1="32" y1="44" x2="32" y2="52" stroke="currentColor" stroke-width="2"/><line x1="24" y1="52" x2="40" y2="52" stroke="currentColor" stroke-width="2"/></svg><p style="font-size:14px;color:var(--text-secondary);margin-bottom:6px">No audio generated yet</p><p style="font-size:12px;color:var(--text-muted)">Head to the TTS page to create your first generation</p></div>`;
       if (!STATE.history.length) { list.innerHTML = emptyHTML; $('#history-count').textContent = '0 files'; $('#delete-all-btn').style.display = 'none'; return; }
-      // Apply filter
-      const filtered = STATE.histFilter === 'all' ? STATE.history
+      // Apply type filter
+      let filtered = STATE.histFilter === 'all' ? STATE.history
         : STATE.histFilter === 'tts' ? STATE.history.filter(h => h._type !== 'force-alignment')
           : STATE.history.filter(h => h._type === 'force-alignment');
+      // Apply search filter
+      const query = ($('#history-search')?.value || '').trim().toLowerCase();
+      if (query) {
+        filtered = filtered.filter(h => {
+          const text = (h.prompt || h.transcript || '').toLowerCase();
+          const voice = (h.voice || '').toLowerCase();
+          const name = (h.filename || h.folder || '').toLowerCase();
+          return text.includes(query) || voice.includes(query) || name.includes(query);
+        });
+      }
       $('#history-count').textContent = filtered.length + ' file' + (filtered.length !== 1 ? 's' : '') + (STATE.histFilter !== 'all' ? ` (${STATE.history.length} total)` : '');
       $('#delete-all-btn').style.display = STATE.history.some(h => h._type !== 'force-alignment') ? 'flex' : 'none';
       if (!filtered.length) { list.innerHTML = `<p style="text-align:center;padding:32px 0;font-size:13px;color:var(--text-muted)">No ${STATE.histFilter === 'tts' ? 'TTS' : 'alignment'} files yet</p>`; return; }
