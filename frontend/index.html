@@ -678,6 +678,49 @@
       }
     }
 
+    /* ---- Mode Toggle (Generate / Listen) ---- */
+    .mode-toggle {
+      display: flex;
+      background: var(--bg-darkest);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 2px;
+      gap: 2px;
+    }
+    .mode-toggle-btn {
+      flex: 1;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      font-family: 'DM Sans', system-ui, sans-serif;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 6px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+    }
+    .mode-toggle-btn:hover { color: var(--text-secondary); }
+    .mode-toggle-btn[data-active="true"] {
+      background: var(--bg-card);
+      color: var(--text);
+      box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+    }
+    .mode-toggle-btn[data-active="true"].mode-generate { color: var(--teal); }
+    .mode-toggle-btn[data-active="true"].mode-listen { color: var(--coral); }
+
+    .gen-btn.listen-mode {
+      background: linear-gradient(135deg, #FF6B6B 0%, #E05555 50%, #B83B3B 100%) !important;
+      box-shadow: 0 4px 20px rgba(255, 107, 107, 0.3);
+    }
+    .gen-btn.listen-mode:hover:not(:disabled) {
+      box-shadow: 0 0 30px rgba(255, 107, 107, 0.4), 0 8px 32px rgba(255, 107, 107, 0.25);
+    }
+
     .abort-btn {
       border: 1px solid rgba(255, 107, 107, 0.3);
       background: rgba(255, 107, 107, 0.08);
@@ -2088,10 +2131,22 @@
           </div>
         </div>
 
+        <!-- Mode Toggle: Generate / Listen -->
+        <div class="mode-toggle reveal" style="animation-delay:0.13s;margin-bottom:10px">
+          <button class="mode-toggle-btn mode-generate" data-active="true" onclick="setGenMode('generate')">
+            <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" viewBox="0 0 24 24"><path d="M12 3v18"/><path d="M5 10l7-7 7 7"/></svg>
+            Generate
+          </button>
+          <button class="mode-toggle-btn mode-listen" data-active="false" onclick="setGenMode('listen')">
+            <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" viewBox="0 0 24 24"><path d="M3 18v-6a9 9 0 0118 0v6"/><path d="M21 19a2 2 0 01-2 2h-1a2 2 0 01-2-2v-3a2 2 0 012-2h3v5z"/><path d="M3 19a2 2 0 002 2h1a2 2 0 002-2v-3a2 2 0 00-2-2H3v5z"/></svg>
+            Listen
+          </button>
+        </div>
+
         <!-- Generate + Abort Buttons -->
         <div style="display:flex;gap:10px;align-items:stretch">
           <button id="generate-btn" class="gen-btn reveal" style="animation-delay:0.14s;flex:1"
-            onclick="handleGenerate()">
+            onclick="handleGenerateOrStream()">
             <span id="gen-label">Generate Audio</span>
             <svg id="gen-spinner" class="hidden"
               style="display:none;width:18px;height:18px;margin-left:8px;vertical-align:middle;animation:spin 0.8s linear infinite"
@@ -2499,6 +2554,8 @@
       blendPickerTarget: null,
       nowPlaying: null, isGenerating: false, history: [],
       dark: true, // Always dark in this design
+      genMode: localStorage.getItem('kokoro-gen-mode') || 'generate',
+      streamAbortController: null, streamAudioCtx: null,
       downloadEventSource: null, chunkEventSource: null, generateAbort: null, eqInterval: null, ffmpeg: false,
       alignment: null, alignmentAvailable: false, alignmentPollTimer: null, activeWordIndex: -1,
       enhanceAvailable: false, enhancePollTimer: null,
@@ -2704,6 +2761,7 @@
         if (savedPrompt) { $('#prompt-input').value = _stripBrackets(savedPrompt); updateCounts(); }
         renderVoices();
         _applyBlendUI();
+        setGenMode(STATE.genMode, true);
         buildEqualizer(); await loadHistory();
       } catch (e) { console.error('Init:', e); toast('Failed to connect to server', 'error'); }
     }
@@ -2851,6 +2909,7 @@
       { name: 'Newscast', a: 'af_nicole', b: 'am_eric', ratio: 30, desc: 'Clear + confident' },
       { name: 'Gentle', a: 'af_kore', b: 'af_river', ratio: 50, desc: 'Soothing blend' },
       { name: 'Bold', a: 'am_fenrir', b: 'am_onyx', ratio: 50, desc: 'Dynamic power' },
+      { name: 'Velvet', a: 'af_bella', b: 'am_adam', ratio: 80, desc: 'Bella-forward warmth' },
     ];
 
     function switchVoiceTab(tab) {
@@ -2908,7 +2967,7 @@
       val = parseInt(val);
       STATE.blendRatio = val;
       localStorage.setItem('kokoro-blend-ratio', val.toString());
-      $('#blend-ratio-label').textContent = `${100 - val} / ${val}`;
+      $('#blend-ratio-label').textContent = `${val} / ${100 - val}`;
       $$('.blend-quick-btn').forEach(b => {
         b.classList.toggle('active', parseInt(b.textContent) === val);
       });
@@ -3315,9 +3374,155 @@
       if (!on && STATE.processingStep === 0) { sp.style.display = 'none'; sp.classList.add('hidden'); }
     }
 
+    // ---- Mode Toggle: Generate / Listen ----
+    function setGenMode(mode, silent) {
+      STATE.genMode = mode;
+      if (!silent) localStorage.setItem('kokoro-gen-mode', mode);
+      document.querySelectorAll('.mode-toggle-btn').forEach(b => {
+        b.dataset.active = b.classList.contains('mode-' + mode) ? 'true' : 'false';
+      });
+      const btn = $('#generate-btn');
+      const label = $('#gen-label');
+      if (mode === 'listen') {
+        btn.classList.add('listen-mode');
+        if (!STATE.isGenerating) label.textContent = 'Listen';
+        $('#process-stepper').style.display = 'none';
+      } else {
+        btn.classList.remove('listen-mode');
+        if (!STATE.isGenerating) label.textContent = 'Generate Audio';
+      }
+    }
+
+    function handleGenerateOrStream() {
+      if (STATE.genMode === 'listen') handleStream();
+      else handleGenerate();
+    }
+
+    // ---- Streaming listen mode ----
+    async function handleStream() {
+      const prompt = $('#prompt-input').value.trim();
+      if (!prompt) { toast('Enter a prompt first', 'error'); return; }
+      if (STATE.isGenerating) return;
+
+      setGenerating(true);
+      $('#gen-label').textContent = 'Streaming...';
+      $('#gen-spinner').style.display = 'inline-block';
+      $('#gen-spinner').classList.remove('hidden');
+
+      const speed = parseFloat($('#speed-select').value) || 1.0;
+      const payload = {
+        model: STATE.selectedModel,
+        voice: STATE.blendMode ? STATE.blendVoiceA : STATE.selectedVoice,
+        prompt, speed
+      };
+      if (STATE.blendMode) {
+        payload.blend = {
+          voice_a: STATE.blendVoiceA, voice_b: STATE.blendVoiceB,
+          ratio: (100 - STATE.blendRatio) / 100, method: STATE.blendMethod
+        };
+      }
+
+      const abortCtrl = new AbortController();
+      STATE.streamAbortController = abortCtrl;
+
+      try {
+        // Check model is downloaded
+        const status = await api(`/api/model-status/${STATE.selectedModel}`, { signal: abortCtrl.signal });
+        if (!status.cached) await downloadModel(STATE.selectedModel);
+
+        const resp = await fetch('/api/stream', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+          signal: abortCtrl.signal,
+        });
+        if (!resp.ok) {
+          const err = await resp.json().catch(() => ({ error: 'Stream request failed' }));
+          throw new Error(err.error || 'Stream request failed');
+        }
+
+        // Web Audio API setup
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)({ sampleRate: 24000 });
+        STATE.streamAudioCtx = audioCtx;
+        let nextPlayTime = audioCtx.currentTime + 0.05; // tiny buffer
+
+        // Read SSE from POST response via ReadableStream
+        const reader = resp.body.getReader();
+        const decoder = new TextDecoder();
+        let buffer = '';
+        let chunkCount = 0;
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          buffer += decoder.decode(value, { stream: true });
+
+          // Parse SSE lines
+          const lines = buffer.split('\n');
+          buffer = lines.pop(); // keep incomplete last line
+
+          for (const line of lines) {
+            if (!line.startsWith('data: ')) continue;
+            let d;
+            try { d = JSON.parse(line.slice(6)); } catch { continue; }
+
+            if (d.phase === 'audio') {
+              chunkCount++;
+              $('#gen-label').textContent = `Streaming ${chunkCount}...`;
+
+              // Decode base64 float32 PCM
+              const raw = atob(d.samples);
+              const bytes = new Uint8Array(raw.length);
+              for (let i = 0; i < raw.length; i++) bytes[i] = raw.charCodeAt(i);
+              const float32 = new Float32Array(bytes.buffer);
+
+              // Create AudioBuffer and schedule playback
+              const sr = d.sample_rate || 24000;
+              const audioBuf = audioCtx.createBuffer(1, float32.length, sr);
+              audioBuf.getChannelData(0).set(float32);
+
+              const source = audioCtx.createBufferSource();
+              source.buffer = audioBuf;
+              source.connect(audioCtx.destination);
+
+              if (nextPlayTime < audioCtx.currentTime) nextPlayTime = audioCtx.currentTime;
+              source.start(nextPlayTime);
+              nextPlayTime += audioBuf.duration;
+            } else if (d.phase === 'done') {
+              // Wait for all queued audio to finish
+              const remaining = nextPlayTime - audioCtx.currentTime;
+              if (remaining > 0) await new Promise(r => setTimeout(r, remaining * 1000 + 100));
+              toast(`Streamed ${d.total_chunks} chunks`);
+            } else if (d.phase === 'error') {
+              throw new Error(d.message || 'Stream failed');
+            }
+          }
+        }
+      } catch (e) {
+        if (e.name === 'AbortError') { toast('Stream aborted', 'info'); }
+        else { toast(e.message || 'Stream failed', 'error'); }
+      } finally {
+        if (STATE.streamAudioCtx) {
+          try { STATE.streamAudioCtx.close(); } catch {}
+          STATE.streamAudioCtx = null;
+        }
+        STATE.streamAbortController = null;
+        setGenerating(false);
+        $('#gen-label').textContent = STATE.genMode === 'listen' ? 'Listen' : 'Generate Audio';
+        $('#gen-spinner').style.display = 'none';
+        $('#gen-spinner').classList.add('hidden');
+      }
+    }
+
     async function abortGeneration() {
       const yes = await confirmDialog({ title: 'Abort Generation?', desc: 'This will stop the current generation immediately.', confirmLabel: 'Abort', confirmColor: 'var(--coral)' });
       if (!yes) return;
+      // Abort stream if active
+      if (STATE.streamAbortController) {
+        STATE.streamAbortController.abort();
+        STATE.streamAbortController = null;
+        if (STATE.streamAudioCtx) { try { STATE.streamAudioCtx.close(); } catch {} STATE.streamAudioCtx = null; }
+      }
       // Tell backend to abort the chunked job
       if (STATE.currentJobId) {
         fetch(`/api/generate-abort/${STATE.currentJobId}`, { method: 'POST' }).catch(() => { });
@@ -3382,7 +3587,7 @@
         if (STATE.blendMode) {
           genPayload.blend = {
             voice_a: STATE.blendVoiceA, voice_b: STATE.blendVoiceB,
-            ratio: STATE.blendRatio / 100, method: STATE.blendMethod
+            ratio: (100 - STATE.blendRatio) / 100, method: STATE.blendMethod
           };
         }
         const genResult = await api('/api/generate', {
@@ -4323,7 +4528,7 @@
     // ======================================================================
     // Keyboard Shortcut
     // ======================================================================
-    document.addEventListener('keydown', e => { if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') { e.preventDefault(); handleGenerate(); } });
+    document.addEventListener('keydown', e => { if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') { e.preventDefault(); handleGenerateOrStream(); } });
 
     // ======================================================================
     // Drag & Drop

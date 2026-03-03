@@ -1,6 +1,8 @@
 """Kokoro TTS Studio — Flask API Server"""
 
 import argparse
+import asyncio
+import base64
 import hashlib
 import json
 import os
@@ -1068,7 +1070,9 @@ def generate():
         if voice not in VOICES:
             return jsonify({"error": f"Unknown voice. Choose from: {VOICES}"}), 400
 
-    # Reject if another generation is already running (prevents OOM from concurrent ONNX)
+    # Reject if another generation or stream is already running (prevents OOM from concurrent ONNX)
+    if _stream_active.is_set():
+        return jsonify({"error": "A stream is already in progress. Please wait."}), 429
     with generation_jobs_lock:
         for job in generation_jobs.values():
             if job.get("status") == "running":
@@ -1242,6 +1246,125 @@ def abort_generation(job_id):
             return jsonify({"error": "Unknown job ID"}), 404
         job["abort"] = True
     return jsonify({"status": "aborting"})
+
+
+# --- Stream audio (listen-only, no save) ---
+
+# Global flag so /api/generate can also reject while streaming is active
+_stream_active = threading.Event()
+
+
+@app.route("/api/stream", methods=["POST"])
+def stream_audio():
+    """Stream TTS audio chunk-by-chunk via SSE using kokoro.create_stream().
+
+    Each sentence is generated and sent as a base64-encoded float32 PCM chunk.
+    Nothing is saved to disk — this is listen-only mode.
+    """
+    data = request.get_json()
+    model_id = data.get("model", "kokoro")
+    voice = data.get("voice", "af_bella")
+    prompt = data.get("prompt", "")
+    speed = float(data.get("speed", 1.0))
+    speed = max(0.5, min(2.0, speed))
+    blend = data.get("blend")
+
+    if not prompt.strip():
+        return jsonify({"error": "Prompt is required"}), 400
+    if model_id not in MODELS:
+        return jsonify({"error": "Unknown model"}), 404
+
+    # Resolve voice
+    voice_param = voice
+    if blend:
+        voice_a = blend.get("voice_a", "")
+        voice_b = blend.get("voice_b", "")
+        ratio = max(0.0, min(1.0, float(blend.get("ratio", 0.5))))
+        method = blend.get("method", "slerp")
+        if method not in ("slerp", "lerp"):
+            method = "slerp"
+        if voice_a not in VOICES:
+            return jsonify({"error": f"Unknown voice_a: {voice_a}"}), 400
+        if voice_b not in VOICES:
+            return jsonify({"error": f"Unknown voice_b: {voice_b}"}), 400
+        kokoro_inst = load_model()
+        voice_param = _blend_voices(kokoro_inst, voice_a, voice_b, ratio, method)
+        voice = voice_a
+    else:
+        if voice not in VOICES:
+            return jsonify({"error": f"Unknown voice. Choose from: {VOICES}"}), 400
+
+    # Reject if another generation/stream is already running
+    with generation_jobs_lock:
+        for job in generation_jobs.values():
+            if job.get("status") == "running":
+                return jsonify({"error": "A generation is already in progress. Please wait or abort."}), 429
+    if _stream_active.is_set():
+        return jsonify({"error": "A stream is already in progress."}), 429
+
+    kokoro = load_model()
+    lang = _voice_to_lang(voice)
+    tts_prompt = clean_for_tts(prompt)
+
+    logger.info("Stream  \033[1m{}\033[0m | {} | {} chars", model_id, voice, len(prompt))
+
+    # Produce audio chunks on a background thread via asyncio event loop + Queue
+    q = Queue()
+
+    def _run_stream():
+        _stream_active.set()
+        loop = asyncio.new_event_loop()
+        try:
+            async def _produce():
+                with generation_inference_lock:
+                    stream = kokoro.create_stream(
+                        text=tts_prompt, voice=voice_param,
+                        speed=speed, lang=lang,
+                    )
+                    async for samples, sr in stream:
+                        q.put(("audio", samples, sr))
+                q.put(("done", None, None))
+
+            loop.run_until_complete(_produce())
+        except Exception as exc:
+            logger.exception("Stream generation failed")
+            q.put(("error", str(exc), None))
+        finally:
+            loop.close()
+            _stream_active.clear()
+
+    t = threading.Thread(target=_run_stream, daemon=True)
+    t.start()
+
+    def _sse():
+        chunk_num = 0
+        while True:
+            try:
+                kind, payload, sr = q.get(timeout=60)
+            except Exception:
+                yield f"data: {json.dumps({'phase': 'error', 'message': 'Stream timed out'})}\n\n"
+                break
+            if kind == "audio":
+                chunk_num += 1
+                pcm_bytes = payload.astype(np.float32).tobytes()
+                b64 = base64.b64encode(pcm_bytes).decode("ascii")
+                yield f"data: {json.dumps({'phase': 'audio', 'chunk': chunk_num, 'samples': b64, 'sample_rate': sr})}\n\n"
+            elif kind == "done":
+                yield f"data: {json.dumps({'phase': 'done', 'total_chunks': chunk_num})}\n\n"
+                break
+            elif kind == "error":
+                yield f"data: {json.dumps({'phase': 'error', 'message': payload})}\n\n"
+                break
+
+    return Response(
+        _sse(),
+        mimetype="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "Connection": "keep-alive",
+            "X-Accel-Buffering": "no",
+        },
+    )
 
 
 # --- List audio files ---
